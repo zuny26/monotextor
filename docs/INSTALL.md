@@ -10,7 +10,7 @@ Step-by-step Monotextor installation from source.
 
 ```bash
 # if you are cloning from scratch:
-git clone --recurse-submodules https://github.com/bitextor/monotextor.git
+git clone --recurse-submodules https://github.com/zuny26/monotextor.git
 
 # otherwise:
 git submodule update --init --recursive
