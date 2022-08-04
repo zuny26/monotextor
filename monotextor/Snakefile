@@ -288,6 +288,7 @@ THREADS = {
     "monofixer": 1,
     "monocleaner": 1,
     "sents": 1,
+    "filter": 1
 }
 if "parallelWorkers" in config:
     for k in config["parallelWorkers"]:
@@ -875,7 +876,7 @@ rule monocleaner:
         fi
         CAT=cat; if [[ {input.monofixer} == *.gz ]]; then CAT=zcat; fi
         $CAT {input.monofixer} \
-                | {PROFILING} cache -k 2 ${{parallel_cmd}} monocleaner --score_only --add_lang_ident --disable_hardrules --scol 2 -q {input.model} - - \
+                | {PROFILING} cache -k 2 ${{parallel_cmd}} monocleaner --score_only --scol 2 -q {input.model} - - \
                 | paste <($CAT {input.monofixer}) - \
                 | pigz -c > {output}
         """
@@ -883,7 +884,7 @@ rule monocleaner:
 
 filter_input = rules.monocleaner.output
 if not MONOCLEANER:
-    filter_input = rules.monocleaner.input.monofixer
+    filter_input = monocleaner_input
 
 
 rule filter:
