@@ -897,7 +897,7 @@ rule filter:
     input:
         filter_input,
     output:
-        temp(f"{DATADIR}/shards/04_03.filtered.{{lang}}.gz"),
+        f"{DATADIR}/shards/04_03.filtered.{{lang}}.gz"
     threads: THREADS["filter"]
     run:
         cat_cmd = "cat"
@@ -910,7 +910,7 @@ rule filter:
             )
         cmd += f""" | LC_ALL=C sort -t $'\t' -k4,4 -k5,5nr --parallel {threads} --compress-program=gzip """  # sorted by monofixer hash and score
         cmd += f""" | LC_ALL=C sort -t $'\t' -k4,4 -u  --parallel {threads} --compress-program=gzip """ # Dedup
-        cmd += f""" | cut -f2 """ # Extract the sentences
+        cmd += f""" | cut -f 1,2 """ # Extract urls and sentences
         cmd += f""" | pigz -c > {output} """
         shell(cmd)
 
@@ -955,7 +955,7 @@ rule sents:
         stats=f"{PERMANENT}/{{lang}}.stats.sent",
     shell:
         """
-        cp {input} {output.corpus}
+        zcat {input} | cut -f 2 | pigz -c > {output.corpus}
         echo "Filtered" > {output.stats}
         echo "File size: $(du -h {output.corpus} | cut -f 1)" >> {output.stats}
         WC1=$(zcat {output.corpus} | cut -f 2 | wc -wl | tr -s ' ')
